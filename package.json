@@ -1,0 +1,38 @@
+{
+  "name": "axiom-server",
+  "description": "Standard server services for Torchlight projects.",
+  "version": "0.0.1",
+  "homepage": "",
+  "repository": "",
+  "author": "Torchlight Software <info@torchlightsoftware.com> (http://torchlightsoftware.com)",
+  "main": "./index.js",
+  "private": true,
+  "dependencies": {
+    "law": "*",
+    "law-connect": "*",
+    "torch": "*",
+    "coffee-script": "*",
+    "connect": "*",
+    "axiom": "*",
+    "axiom-base": "*"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "request": "*",
+    "should": "*",
+    "lodash": "*",
+    "mockery": "*"
+  },
+  "engines":{
+    "node": ">= 0.8.4"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": ""
+    }
+  ],
+  "scripts": {
+    "test": "mocha"
+  }
+}
