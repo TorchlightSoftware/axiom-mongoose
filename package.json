@@ -1,5 +1,5 @@
 {
-  "name": "axiom-server",
+  "name": "axiom-mongoose",
   "description": "Standard server services for Torchlight projects.",
   "version": "0.0.1",
   "homepage": "",
@@ -8,19 +8,18 @@
   "main": "./index.js",
   "dependencies": {
     "law": "*",
-    "law-connect": "*",
-    "torch": "*",
-    "coffee-script": "*",
-    "connect": "*",
-    "axiom": "*",
-    "axiom-base": "*"
+    "async": "*",
+    "mongoose": "*",
+    "coffee-script": "*"
   },
   "devDependencies": {
-    "mocha": "*",
-    "request": "*",
-    "should": "*",
     "lodash": "*",
-    "mockery": "*"
+    "torch": "*",
+    "axiom": "*",
+    "axiom-server": "*",
+    "axiom-base": "*",
+    "mocha": "*",
+    "should": "*"
   },
   "engines":{
     "node": ">= 0.8.4"

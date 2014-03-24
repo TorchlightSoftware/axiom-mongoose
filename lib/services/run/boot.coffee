@@ -1,44 +1,33 @@
 {join} = require 'path'
 fs = require 'fs'
-
-logger = require 'torch'
-http = require 'http'
-https = require 'https'
-
 read = (file) -> fs.readFileSync file, 'utf8'
+async = require 'async'
+logger = require 'torch'
 
 module.exports =
   service: (args, done) ->
 
-    finished = (err) =>
-      @axiom.log.info "Started server on port #{@config.port}."
-      done(err)
+    @db = require 'mongoose'
 
-    {app} = @config
-    done ?= ->
+    loadModel = (name) =>
+      schema = @util.retrieve "models/#{name}"
+      # convert objectIDs to strings
+      schema.path('_id').get (_id) -> _id.toString()
 
-    if @config.ssl
+      @db.model name, schema
 
-      # read cert files
-      ca = config.app.ssl.ca || []
-      options =
-        key: read config.app.ssl.key
-        cert: read config.app.ssl.cert
-        ca: ca.map read
+    if @config.debug
+      @db.set 'debug', @config.debug
 
-      # create server with ssl
-      server = https.createServer(options, app).listen @config.port, finished
+    connectionString = @config.host + (@app.appName or '__axiom_test')
+    @db.connect connectionString
+    @db.connection.on 'error', @axiom.log.error
 
-      #http server to redirect to https
-      if @config.ssl.redirectFrom?
-        redirect = (req, res) ->
-          redirectTarget = "https://#{req.headers.host}#{req.url}"
-          res.writeHead 301, {
-            "Location": redirectTarget
-          }
-          res.end()
-        redirectServer = http.createServer(redirect).listen config.app.ssl.redirectFrom
-      @config.server = server
+    for model in @config.models
+      loadModel model
 
-    else
-      @config.server = http.createServer(app).listen @config.port, finished
+    @db.wipe = (cb) =>
+      async.parallel (m.remove.bind m, null for _, m of @db.models), cb
+
+    @axiom.log.info "Connected to mongo at: #{connectionString}."
+    done()
