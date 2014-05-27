@@ -10,18 +10,18 @@
     "law": "*",
     "async": "*",
     "mongoose": "*",
-    "coffee-script": "*"
+    "coffee-script": "*",
+    "factory-worker": "^0.7.0"
   },
   "devDependencies": {
     "lodash": "*",
     "torch": "*",
     "axiom": "*",
-    "axiom-server": "*",
-    "axiom-base": "*",
+    "axiom-protocol": "*",
     "mocha": "*",
     "should": "*"
   },
-  "engines":{
+  "engines": {
     "node": ">= 0.8.4"
   },
   "licenses": [

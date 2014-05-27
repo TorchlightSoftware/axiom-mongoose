@@ -6,10 +6,11 @@ rel = (args...) -> join __dirname, args...
 
 module.exports =
   config:
-    run:
-      extends: 'server'
-      models: []
-      host: "mongodb://localhost:27017/"
+    host: 'mongodb://localhost:27017/default'
+
+  attachments:
+    boot: ['server.run/load', 'server.test/load']
+    link: ['server.run/link', 'server.test/link']
 
   # Services used by the extension
-  services: law.load rel('services')
+  services: law.load rel 'services'
