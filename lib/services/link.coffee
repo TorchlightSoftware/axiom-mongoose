@@ -44,4 +44,8 @@ module.exports =
         model.findOneAndRemove {_id}, (err, result) ->
           done err, buildObject(instance, result?.toJSON())
 
+      # connect any static methods that have been defined on the schema
+      for method of model.schema.statics
+        @axiom.respond "resources/#{collection}/#{method}", model[method].bind model
+
     done()

@@ -1,5 +1,11 @@
 db = require 'mongoose'
 {Schema} = db
 
-module.exports = new Schema
+User = new Schema
   email: String
+
+User.statics.findByEmail = ({email}, done) ->
+  @findOne {email}, (err, user) ->
+    done err, {user: user.toJSON()}
+
+module.exports = User

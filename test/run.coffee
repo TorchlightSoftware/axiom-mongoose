@@ -130,3 +130,23 @@ describe 'Mongoose', ->
             user.should.eql createdUser.toJSON()
 
             done()
+
+    it 'should respond to users/findByEmail', (done) ->
+
+      @Factory.create 'user', (err, createdUser) =>
+        should.not.exist err
+
+        # When I create a user
+        axiom.request "mongoose.resources/users/findByEmail", {
+            email: createdUser.email
+          }, (err, result) =>
+
+            # Then I should get the user I created
+            should.not.exist err
+            should.exist result, 'expected result'
+
+            {user} = result
+            should.exist user, 'expected user'
+            user.should.eql createdUser.toJSON()
+
+            done()
