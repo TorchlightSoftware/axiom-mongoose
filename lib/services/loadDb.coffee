@@ -14,21 +14,21 @@ module.exports =
 
     # connect to database
     db = mongoose.createConnection @config.host
-    db.on 'error', @axiom.log.error
-    @axiom.log.info "Connected to mongo at: #{@config.host}."
+    db.on 'error', @log.error
+    @log.info "Connected to mongo at: #{@config.host}."
 
     # load models
-    modelDir = @retriever.rel 'models'
+    modelDir = @rel 'models'
     fs.readdir modelDir, (err, files) =>
       if err
-        @axiom.log.warning "Mongoose Extension could not read model directory:\n#{err.message}"
+        @log.warning "Mongoose Extension could not read model directory:\n#{err.message}"
         return done()
 
       names = for fname in files
         [parts..., ext] = fname.split('.')
         name = parts.join '.'
 
-        schema = @retriever.retrieve 'models', name
+        schema = @retrieve 'models', name
 
         # convert objectIDs to strings
         schema.path('_id').get (_id) -> _id.toString()
@@ -36,6 +36,6 @@ module.exports =
         db.model name, schema
         name #return
 
-      @axiom.log.info "Loaded models:", names
+      @log.info "Loaded models:", names
 
       done null, {db}

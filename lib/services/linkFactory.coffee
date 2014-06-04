@@ -19,13 +19,24 @@ Factory.clear = (done) ->
 
   async.forEach Object.keys(Factory.models), clearModel, done
 
-module.exports = (models) ->
+module.exports =
+  required: ['db']
+  service: ({db}, done) ->
 
-  Factory.models = models
-  {User} = models
+    Factory.models = db.models
 
-  Factory.define 'user', User, {
-    email: 'foo@bar.com'
-  }
+    # initialize the application's sample data
+    try
+      @retrieve('fixtures/data')(Factory)
+    catch e
+      output = e.stack or e.message or e
+      @log.warning "Could not load sample-data:\n#{output}"
 
-  return Factory
+    for name of Factory.patterns
+      @respond "factory/#{name}", (args, next) ->
+        Factory.create name, args, (err, result) ->
+          obj = {}
+          obj[name] = result
+          next err, obj
+
+    done null, {Factory}

@@ -14,22 +14,22 @@ module.exports =
       instance = name.toLowerCase()
       collection = model.collection.name
 
-      @axiom.respond "resources/#{collection}/index", (args, done) ->
+      @respond "resources/#{collection}/index", (args, done) ->
         model.find args, (err, results) ->
           results = (r.toJSON() for r in results) if results
           done err, buildObject(collection, results)
 
-      @axiom.respond "resources/#{collection}/create", (args, done) ->
+      @respond "resources/#{collection}/create", (args, done) ->
         model.create args, (err, result) ->
           done err, buildObject(instance, result?.toJSON())
 
       # required: ['_id']
-      @axiom.respond "resources/#{collection}/show", ({_id}, done) ->
+      @respond "resources/#{collection}/show", ({_id}, done) ->
         model.findById _id, (err, result) ->
           done err, buildObject(instance, result?.toJSON())
 
       # required: ['_id']
-      @axiom.respond "resources/#{collection}/update", (args, done) ->
+      @respond "resources/#{collection}/update", (args, done) ->
         {_id} = args
         args = _.omit args, '_id'
 
@@ -37,7 +37,7 @@ module.exports =
           done err, buildObject(instance, result?.toJSON())
 
       # required: ['_id']
-      @axiom.respond "resources/#{collection}/delete", (args, done) ->
+      @respond "resources/#{collection}/delete", (args, done) ->
         {_id} = args
         args = _.omit args, '_id'
 
@@ -46,6 +46,6 @@ module.exports =
 
       # connect any static methods that have been defined on the schema
       for method of model.schema.statics
-        @axiom.respond "resources/#{collection}/#{method}", model[method].bind model
+        @respond "resources/#{collection}/#{method}", model[method].bind model
 
     done()

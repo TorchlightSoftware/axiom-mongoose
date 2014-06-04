@@ -10,9 +10,7 @@ _ = require 'lodash'
 db = require 'mongoose'
 axiomMongoose = require '..'
 
-factoryConstructor = require './fixtures/Factory'
-
-describe 'Mongoose', ->
+describe 'Mongoose Run', ->
   before (done) ->
 
     axiom.wireUpLoggers [{writer: 'console', level: 'warning'}]
@@ -23,11 +21,14 @@ describe 'Mongoose', ->
       should.not.exist err
       @db = db
 
-      @Factory = factoryConstructor(db.models)
-      @Factory.clear(done)
+      axiom.request 'mongoose.linkFactory', {db}, (err, {@Factory}) =>
+        @Factory.clear(done)
 
   afterEach (done) ->
     @Factory.clear(done)
+
+  after (done) ->
+    axiom.reset(done)
 
   it 'models should be loaded after server.run', ->
     @db.models.should.have.keys ['User']
