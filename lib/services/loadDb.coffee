@@ -37,7 +37,14 @@ module.exports =
           # convert objectIDs to strings
           schema.path('_id').get (_id) -> _id.toString()
 
-          db.model name, schema
+          try
+            db.model name, schema
+          catch e
+            msg = "Failed loading model '#{name}'.\n"
+            err = new Error msg + e.message
+            err.stack = msg + e.stack
+            throw err
+
           names.push name
 
       @log.info "Loaded models:", names
