@@ -27,7 +27,7 @@ module.exports =
 
     # initialize the application's sample data
     try
-      @retrieve('fixtures/data')(Factory)
+      @retrieve(@config.dataLocation)(Factory)
     catch e
       output = e.stack or e.message or e
       @log.warning "Could not load sample-data:\n#{output}"

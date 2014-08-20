@@ -6,6 +6,9 @@ rel = (args...) -> join __dirname, args...
 module.exports =
   config:
     host: 'mongodb://localhost:27017/default'
+    modelDir: 'app/server/models'
+    dataLocation: 'fixtures/data'
+    seedLocation: 'fixtures/seed'
 
   extends:
     loadDb: ['server.run/load', 'server.test/load', 'db.seed/load']
