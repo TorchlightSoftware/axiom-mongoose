@@ -1,5 +1,6 @@
 logger = require 'torch'
 _ = require 'lodash'
+law = require 'law'
 
 buildObject = (key, value) ->
   obj = {}
@@ -14,35 +15,48 @@ module.exports =
       instance = name.toLowerCase()
       collection = model.collection.name
 
-      @respond "resources/#{collection}/index", (args, done) ->
-        model.find args, (err, results) ->
-          results = (r.toJSON() for r in results) if results
-          done err, buildObject(collection, results)
+      resources = law.create
+        services:
 
-      @respond "resources/#{collection}/create", (args, done) ->
-        model.create args, (err, result) ->
-          done err, buildObject(instance, result?.toJSON())
+          index:
+            service: (args, done) ->
+              model.find args, (err, results) ->
+                results = (r.toJSON() for r in results) if results
+                done err, buildObject(collection, results)
 
-      # required: ['_id']
-      @respond "resources/#{collection}/show", ({_id}, done) ->
-        model.findById _id, (err, result) ->
-          done err, buildObject(instance, result?.toJSON())
+          create:
+            service: (args, done) ->
+              model.create args, (err, result) ->
+                done err, buildObject(instance, result?.toJSON())
+          show:
+            required: ['_id']
+            service: ({_id}, done) ->
+              model.findById _id, (err, result) ->
+                done err, buildObject(instance, result?.toJSON())
 
-      # required: ['_id']
-      @respond "resources/#{collection}/update", (args, done) ->
-        {_id} = args
-        args = _.omit args, '_id'
+          update:
+            required: ['_id']
+            service: (args, done) ->
+              {_id} = args
+              args = _.omit args, '_id'
 
-        model.findOneAndUpdate {_id}, args, (err, result) ->
-          done err, buildObject(instance, result?.toJSON())
+              model.findById _id, (err, result) ->
+                return done(err) if err?
+                result.set(args)
+                result.save (err) ->
+                  done err, buildObject(instance, result?.toJSON())
 
-      # required: ['_id']
-      @respond "resources/#{collection}/delete", (args, done) ->
-        {_id} = args
-        args = _.omit args, '_id'
+          delete:
+            required: ['_id']
+            service: ({_id}, done) ->
+              model.findOneAndRemove {_id}, (err, result) ->
+                done err, buildObject(instance, result?.toJSON())
 
-        model.findOneAndRemove {_id}, (err, result) ->
-          done err, buildObject(instance, result?.toJSON())
+      @respond "resources/#{collection}/index", resources.index
+      @respond "resources/#{collection}/create", resources.create
+      @respond "resources/#{collection}/show", resources.show
+      @respond "resources/#{collection}/update", resources.update
+      @respond "resources/#{collection}/delete", resources.delete
 
       # connect any static methods that have been defined on the schema
       for method of model.schema.statics

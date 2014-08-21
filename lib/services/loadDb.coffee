@@ -32,7 +32,8 @@ module.exports =
           [parts..., ext] = fname.split('.')
           name = parts.join '.'
 
-          schema = @retrieve @config.modelDir, name
+          schemaBuilder = @retrieve @config.modelDir, name
+          schema = schemaBuilder(mongoose.Schema)
 
           # convert objectIDs to strings
           schema.path('_id').get (_id) -> _id.toString()
