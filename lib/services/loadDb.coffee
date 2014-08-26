@@ -2,7 +2,6 @@
 fs = require 'fs'
 read = (file) -> fs.readFileSync file, 'utf8'
 async = require 'async'
-logger = require 'torch'
 
 module.exports =
   service: (args, done) ->

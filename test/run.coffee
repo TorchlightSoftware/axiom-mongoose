@@ -3,8 +3,6 @@ rel = (args...) -> join __dirname, '..', args...
 
 should = require 'should'
 axiom = require 'axiom'
-logger = require 'torch'
-logger.toggleElapsed()
 _ = require 'lodash'
 
 db = require 'mongoose'

@@ -1,5 +1,3 @@
-logger = require 'torch'
-
 module.exports =
   required: ['Factory']
   service: ({Factory}, done) ->
