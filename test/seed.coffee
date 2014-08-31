@@ -29,7 +29,7 @@ describe 'Mongoose Seed', ->
     # get our own model for data verification
     db = require 'mongoose'
     db.connect axiomMongoose.config.host
-    db.model 'User', require('../sample/app/server/models/User')(db.Schema)
+    db.model 'User', require('../sample/domain/mongoose/models/User')(db.Schema)
 
     {User} = db.models
 
