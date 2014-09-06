@@ -18,50 +18,47 @@ module.exports =
         resources = law.create
           services:
 
-            find:
-              optional: ['conditions', 'fields', 'options']
-              service: ({conditions, fields, options}, done) ->
-                conditions or= {}
-                model.find conditions, fields, options, (err, results) ->
+            index:
+              service: (args, done) ->
+                model.find args, (err, results) ->
                   results = (r.toJSON() for r in results) if results
                   done err, buildObject(collection, results)
 
             create:
-              required: ['document']
-              service: ({document}, done) ->
-                model.create document, (err, result) ->
+              service: (args, done) ->
+                model.create args, (err, result) ->
                   done err, buildObject(instance, result?.toJSON())
 
-            findone:
-              required: ['conditions']
-              optional: ['fields', 'options']
-              service: ({conditions, fields, options}, done) ->
-                model.findOne conditions, fields, options, (err, result) ->
+            show:
+              required: ['_id']
+              service: ({_id}, done) ->
+                model.findById _id, (err, result) ->
                   # return 404 if not found?
                   done err, buildObject(instance, result?.toJSON())
 
             update:
-              required: ['conditions', 'update']
-              optional: ['options']
-              service: ({conditions, update, options}, done) ->
-                model.findOne conditions, update, options, (err, result) ->
-                  return done(err) if err?
+              required: ['_id']
+              service: (args, done) ->
+                {_id} = args
+                args = _.omit args, '_id'
 
-                  result.set(update)
+                model.findById _id, (err, result) ->
+                  return done(err) if err?
+                  result.set(args)
                   result.save (err) ->
                     done err, buildObject(instance, result?.toJSON())
 
-            remove:
-              required: ['conditions']
-              service: ({conditions}, done) ->
-                model.findOneAndRemove conditions, (err, result) ->
+            delete:
+              required: ['_id']
+              service: ({_id}, done) ->
+                model.findOneAndRemove {_id}, (err, result) ->
                   done err, buildObject(instance, result?.toJSON())
 
-        @respond "resources/#{collection}/find", resources.find
+        @respond "resources/#{collection}/index", resources.index
         @respond "resources/#{collection}/create", resources.create
-        @respond "resources/#{collection}/findone", resources.findone
+        @respond "resources/#{collection}/show", resources.show
         @respond "resources/#{collection}/update", resources.update
-        @respond "resources/#{collection}/remove", resources.remove
+        @respond "resources/#{collection}/delete", resources.delete
 
         # connect any static methods that have been defined on the schema
         for method of model.schema.statics
