@@ -33,10 +33,15 @@ module.exports =
       @log.warning "Could not load sample-data:\n#{output}"
 
     for name of Factory.patterns
-      @respond "factory/#{name}", (args, next) ->
-        Factory.create name, args, (err, result) ->
-          obj = {}
-          obj[name] = result
-          next err, obj
+      do (name) =>
+        @respond "factory/#{name}", (args, next) ->
+          Factory.create name, args, (err, result) ->
+            obj = {}
+            obj[name] = result?.toObject()
+            next err, obj
+
+    @respond 'factory/clear', (args, finished) =>
+      #@log.warning 'Clearing data.'
+      Factory.clear(finished)
 
     done null, {Factory}

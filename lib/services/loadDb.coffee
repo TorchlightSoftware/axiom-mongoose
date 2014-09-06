@@ -21,7 +21,7 @@ module.exports =
     fs.readdir modelDir, (err, files) =>
       if err
         @log.warning "Mongoose Extension could not read model directory:\n#{err.message}"
-        return done()
+        return done null, {db}
 
       names = []
       for fname in files
@@ -32,7 +32,7 @@ module.exports =
           name = parts.join '.'
 
           schemaBuilder = @retrieve @config.modelDir, name
-          schema = schemaBuilder(mongoose.Schema)
+          schema = schemaBuilder.call(@appRetriever, mongoose.Schema)
 
           # convert objectIDs to strings
           schema.path('_id').get (_id) -> _id.toString()

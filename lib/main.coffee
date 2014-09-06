@@ -18,5 +18,7 @@ module.exports =
 
     unloadDb: ['server.run/unload', 'server.test/unload', 'db.seed/unload']
 
+    'clearData': ['server.test/before', 'server.test/afterEach']
+
   # Services used by the extension
   services: law.load rel 'services'

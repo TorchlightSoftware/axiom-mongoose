@@ -33,14 +33,14 @@ describe 'Mongoose Run', ->
 
   describe 'CRUD', ->
 
-    it 'should respond to users/index', (done) ->
+    it 'should respond to users/find', (done) ->
 
       # Given a user in the system
       @Factory.create 'user', (err, createdUser) =>
         should.not.exist err
 
         # When I request a user listing
-        axiom.request "mongoose.resources/users/index", {}, (err, result) =>
+        axiom.request "mongoose.resources/users/find", {}, (err, result) =>
 
           # Then I should get the user I created
           should.not.exist err
@@ -53,31 +53,18 @@ describe 'Mongoose Run', ->
 
           done()
 
-    it 'should respond to users/show', (done) ->
+    it 'should respond to users/findone', (done) ->
 
       # Given a user in the system
       @Factory.create 'user', (err, createdUser) =>
         should.not.exist err
 
         # When I request a user
-        axiom.request "mongoose.resources/users/show",
-          {_id: createdUser._id}, (err, result) =>
+        axiom.request "mongoose.resources/users/findone", {
+          conditions:
+            _id: createdUser._id
 
-            # Then I should get the user I created
-            should.not.exist err
-            should.exist result, 'expected result'
-
-            {user} = result
-            should.exist user, 'expected user'
-            user.should.eql createdUser.toJSON()
-
-            done()
-
-    it 'should respond to users/create', (done) ->
-
-      # When I create a user
-      axiom.request "mongoose.resources/users/create",
-        {email: 'jon@test.com'}, (err, result) =>
+        }, (err, result) =>
 
           # Then I should get the user I created
           should.not.exist err
@@ -85,9 +72,28 @@ describe 'Mongoose Run', ->
 
           {user} = result
           should.exist user, 'expected user'
-          user.email.should.eql 'jon@test.com'
+          user.should.eql createdUser.toJSON()
 
           done()
+
+    it 'should respond to users/create', (done) ->
+
+      # When I create a user
+      axiom.request "mongoose.resources/users/create", {
+        document:
+          email: 'jon@test.com'
+
+      }, (err, result) =>
+
+        # Then I should get the user I created
+        should.not.exist err
+        should.exist result, 'expected result'
+
+        {user} = result
+        should.exist user, 'expected user'
+        user.email.should.eql 'jon@test.com'
+
+        done()
 
     it 'should respond to users/update', (done) ->
 
@@ -96,39 +102,42 @@ describe 'Mongoose Run', ->
 
         # When I create a user
         axiom.request "mongoose.resources/users/update", {
+          conditions:
             _id: createdUser._id
+          update:
             email: 'not-jon@test.com'
-          }, (err, result) =>
+        }, (err, result) =>
 
-            # Then I should get the user I created
-            should.not.exist err
-            should.exist result, 'expected result'
+          # Then I should get the user I created
+          should.not.exist err
+          should.exist result, 'expected result'
 
-            {user} = result
-            should.exist user, 'expected user'
-            user.email.should.eql 'not-jon@test.com'
+          {user} = result
+          should.exist user, 'expected user'
+          user.email.should.eql 'not-jon@test.com'
 
-            done()
+          done()
 
-    it 'should respond to users/delete', (done) ->
+    it 'should respond to users/remove', (done) ->
 
       @Factory.create 'user', (err, createdUser) =>
         should.not.exist err
 
         # When I create a user
-        axiom.request "mongoose.resources/users/delete", {
+        axiom.request "mongoose.resources/users/remove", {
+          conditions:
             _id: createdUser._id
-          }, (err, result) =>
+        }, (err, result) =>
 
-            # Then I should get the user I created
-            should.not.exist err
-            should.exist result, 'expected result'
+          # Then I should get the user I created
+          should.not.exist err
+          should.exist result, 'expected result'
 
-            {user} = result
-            should.exist user, 'expected user'
-            user.should.eql createdUser.toJSON()
+          {user} = result
+          should.exist user, 'expected user'
+          user.should.eql createdUser.toJSON()
 
-            done()
+          done()
 
     it 'should respond to users/findByEmail', (done) ->
 
