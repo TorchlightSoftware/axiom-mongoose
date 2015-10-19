@@ -15,6 +15,14 @@ module.exports =
         instance = name.toLowerCase()
         collection = model.collection.name
 
+        # connect any static methods that have been defined on the schema
+        for method of model.schema.statics
+          @respond "resources/#{collection}/#{method}", model[method].bind model
+
+        skipping = @config.skipResources?[collection] or {}
+        if skipping is true
+          return
+
         resources = law.create
           services:
 
@@ -54,14 +62,11 @@ module.exports =
                 model.findOneAndRemove {_id}, (err, result) ->
                   done err, buildObject(instance, result?.toJSON())
 
-        @respond "resources/#{collection}/index", resources.index
-        @respond "resources/#{collection}/create", resources.create
-        @respond "resources/#{collection}/show", resources.show
-        @respond "resources/#{collection}/update", resources.update
-        @respond "resources/#{collection}/delete", resources.delete
-
-        # connect any static methods that have been defined on the schema
-        for method of model.schema.statics
-          @respond "resources/#{collection}/#{method}", model[method].bind model
+        # connect default resource actions
+        #   - unless configured to skip them
+        #   - or they are custom defined in statics
+        for action in ['index', 'create', 'show', 'update', 'delete']
+          unless skipping[action] or (action in _.keys model.schema.statics)
+            @respond "resources/#{collection}/#{action}", resources[action]
 
     done()

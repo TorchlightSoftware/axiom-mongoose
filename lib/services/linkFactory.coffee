@@ -1,5 +1,10 @@
 async = require 'async'
 Factory = require 'factory-worker'
+{walk, convertObjectID} = require '../helpers/util'
+
+cleanDocument = (doc) ->
+  if doc?
+    walk doc.toObject(), convertObjectID
 
 # helpers for constructing chains and chain collections
 Factory.createRef = (name, fields, done) ->
@@ -37,7 +42,7 @@ module.exports =
         @respond "factory/#{name}", (args, next) ->
           Factory.create name, args, (err, result) ->
             obj = {}
-            obj[name] = result?.toObject()
+            obj[name] = cleanDocument(result)
             next err, obj
 
     @respond 'factory/clear', (args, finished) =>
